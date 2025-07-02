@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "revenuMensuel" DOUBLE PRECISION NOT NULL DEFAULT 2000;
