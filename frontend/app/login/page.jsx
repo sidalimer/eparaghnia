@@ -1,16 +1,15 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { Mail, Lock } from 'lucide-react';
 import api from '@/lib/api';
-import { LogIn, Eye, EyeOff } from 'lucide-react';
+import { Logo } from '@/components/AppShell';
 
 export default function LoginPage() {
-  const { register, handleSubmit } = useForm();
-  const [error, setError] = useState('');
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false); // 👁 gestion mot de passe visible
+  const [error, setError] = useState('');
+  const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data) => {
     try {
@@ -18,72 +17,59 @@ export default function LoginPage() {
       localStorage.setItem('token', res.data.token);
       router.push('/dashboard');
     } catch (err) {
-      setError('Email ou mot de passe invalide');
+      setError(err.response?.data?.message || 'Connexion impossible. Vérifiez vos identifiants.');
     }
   };
 
+  const field = 'w-full rounded-xl border border-[#e3e8eb] bg-white py-3 pl-11 pr-3 text-sm outline-none focus:border-[#27ae60] focus:ring-2 focus:ring-[#27ae60]/20';
+
   return (
-    <div className="min-h-screen bg-[#F4F6F7] flex items-center justify-center px-4">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-white p-8 rounded-[12px] shadow-lg w-full max-w-sm"
-        style={{ fontFamily: 'Open Sans, sans-serif' }}
-      >
-        <h1 className="text-2xl font-bold mb-6 text-[#2C3E50]" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          <span className="inline-flex items-center gap-2">
-            <LogIn size={20} className="text-[#4CAF50]" />
-            Connexion
-          </span>
-        </h1>
-
-        {error && (
-          <p className="text-[#E74C3C] mb-4 text-sm">{error}</p>
-        )}
-
-        <label className="block mb-4 text-[#333333] text-sm">
-          Email
-          <input
-            type="email"
-            {...register('email', { required: true })}
-            className="w-full mt-1 p-2 border border-gray-300 rounded-[12px] text-[#333333] focus:outline-none focus:ring-2 focus:ring-[#4CAF50]"
-          />
-        </label>
-
-        <label className="block mb-6 text-[#333333] text-sm relative">
-          Mot de passe
-          <input
-            type={showPassword ? 'text' : 'password'}
-            {...register('password', { required: true })}
-            className="w-full mt-1 p-2 border border-gray-300 rounded-[12px] text-[#333333] focus:outline-none focus:ring-2 focus:ring-[#4CAF50] pr-10"
-          />
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute top-[35px] right-3 text-gray-500 cursor-pointer"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </span>
-        </label>
-
-        <button
-          type="submit"
-          className="w-full bg-[#2C3E50] text-white p-2 rounded-[12px] hover:bg-[#1e2d3a] shadow-md transition duration-200"
-          style={{ fontFamily: 'Poppins, sans-serif' }}
-        >
-          Se connecter
-        </button>
-
-        {/* 🔗 Lien vers /register */}
-        <div className="text-center mt-4 text-sm text-[#333333]">
-          Pas encore de compte ?{' '}
-          <button
-            type="button"
-            onClick={() => router.push('/register')}
-            className="text-[#4CAF50] hover:underline"
-          >
-            Créer un compte
-          </button>
+    <div className="grid min-h-screen lg:grid-cols-2">
+      <aside className="hidden flex-col justify-between bg-[#2c3e50] p-12 text-white lg:flex">
+        <Logo light />
+        <div>
+          <p className="text-3xl font-bold leading-snug">Sachez ce qu'il vous reste avant de dépenser.</p>
+          <p className="mt-4 max-w-sm text-white/70">Revenus, charges fixes et épargne : votre reste à vivre est calculé pour vous.</p>
         </div>
-      </form>
+        <p className="text-sm text-white/50">Eparagnia · gestion de budget personnel</p>
+      </aside>
+
+      <main className="grid place-items-center px-6 py-12">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm space-y-5">
+          <div className="lg:hidden"><Logo /></div>
+          <div>
+            <h1 className="text-3xl font-bold text-[#2c3e50]">Bon retour</h1>
+            <p className="mt-1 text-sm text-[#6b7b88]">Connectez-vous pour retrouver votre budget.</p>
+          </div>
+
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-semibold text-[#2c3e50]">Adresse e-mail</span>
+            <span className="relative block">
+              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6b7b88]" />
+              <input type="email" placeholder="vous@exemple.fr" className={field} {...register('email', { required: true })} />
+            </span>
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-semibold text-[#2c3e50]">Mot de passe</span>
+            <span className="relative block">
+              <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6b7b88]" />
+              <input type="password" placeholder="••••••••" className={field} {...register('password', { required: true })} />
+            </span>
+          </label>
+
+          {error && <p className="text-sm font-semibold text-[#e74c3c]">{error}</p>}
+
+          <button type="submit" className="w-full rounded-xl bg-[#27ae60] py-3 font-bold text-white hover:bg-[#1f9a52]">
+            Se connecter
+          </button>
+          <p className="text-center text-sm text-[#6b7b88]">
+            Pas encore de compte ?{' '}
+            <button type="button" onClick={() => router.push('/register')} className="font-bold text-[#2c3e50] underline">
+              Créer un compte
+            </button>
+          </p>
+        </form>
+      </main>
     </div>
   );
 }
